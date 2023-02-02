@@ -35,11 +35,17 @@ func (d *Date) UnmarshalJSON(b []byte) error {
 
 type Timestamp time.Time
 
+var bt = time.Date(2000, 1, 1, 0, 0, 0, 0, time.Local)
+
 func (t *Timestamp) UnmarshalJSON(b []byte) error {
 	i, err := strconv.ParseInt(string(b), 10, 64)
 	if err != nil {
 		return err
 	}
-	*t = Timestamp(time.Unix(i, 0))
+	if time.UnixMilli(i).After(bt) {
+		*t = Timestamp(time.UnixMilli(i))
+	} else {
+		*t = Timestamp(time.Unix(i, 0))
+	}
 	return nil
 }
